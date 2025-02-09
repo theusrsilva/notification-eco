@@ -1,0 +1,58 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: db-eco
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - notification-eco
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak-eco
+    command: [ "start-dev", "--import-realm"]
+    restart: always
+    environment:
+      KC_DB: mysql
+      KC_DB_URL_HOST: db-eco
+      KC_DB_USERNAME: root
+      KC_DB_PASSWORD: root
+      KC_DB_DATABASE: keycloak
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    volumes:
+      - ./docker/realm-config.json:/opt/keycloak/data/import/realm-config.json
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    networks:
+      - notification-eco
+
+  api-clima:
+    build: ./api-clima
+    container_name: api-clima-eco
+    restart: always
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./api-clima:/go/src/
+    depends_on:
+      - mysql
+      - keycloak
+    networks:
+      - notification-eco
+
+volumes:
+  mysql_data:
+    driver: local
+networks:
+  notification-eco:
+    driver: bridge

@@ -1,0 +1,28 @@
+{
+  "realm": "eco",
+  "enabled": true,
+  "clients": [
+    {
+      "clientId": "api-clima",
+      "enabled": true,
+      "redirectUris": ["http://localhost:8080/*"],
+      "clientAuthenticatorType": "client-secret",
+      "secret": "Senh@123"
+    }
+  ],
+  "users": [
+    {
+      "username": "eco-user",
+      "enabled": true,
+      "email": "admin@eco.com",
+      "firstName": "eco",
+      "lastName": "user",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Senh@123"
+        }
+      ]
+    }
+  ]
+}
