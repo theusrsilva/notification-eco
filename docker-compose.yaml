@@ -44,9 +44,9 @@ services:
       - "3001:3000"
     volumes:
       - ./api-clima:/go/src/
-    depends_on:
-      - mysql
-      - keycloak
+#    depends_on:
+#      - mysql
+#      - keycloak
     networks:
       - notification-eco
 
