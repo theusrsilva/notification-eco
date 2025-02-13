@@ -29,7 +29,7 @@ type CidadeResponse struct {
 }
 
 func GetCidades(cidade string) ([]Cidade, error) {
-	buscaCidade := cidade
+	buscaCidade := strings.ReplaceAll(cidade, " ", "%20")
 	url := fmt.Sprintf(os.Getenv("CPTEC_URL")+"listaCidades?city=%s", buscaCidade)
 
 	redis := database.NewRedisClient(0)
@@ -72,9 +72,7 @@ func GetCidades(cidade string) ([]Cidade, error) {
 
 	var cidadesEncontradas []Cidade
 	for _, c := range cidadesResponse.Cidades {
-		if strings.Contains(strings.ToLower(c.Nome), strings.ToLower(cidade)) {
-			cidadesEncontradas = append(cidadesEncontradas, c)
-		}
+		cidadesEncontradas = append(cidadesEncontradas, c)
 	}
 	if len(cidadesEncontradas) == 0 {
 		return nil, fmt.Errorf("nenhuma cidade encontrada")
