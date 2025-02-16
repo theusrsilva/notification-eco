@@ -3,11 +3,25 @@ package main
 import (
 	"api-clima/framework/database"
 	"api-clima/framework/server"
+	"fmt"
 	"github.com/joho/godotenv"
 	"log"
 	"os"
 	"strconv"
+	"time"
 )
+
+var SaoPauloTimeZone *time.Location
+
+func init() {
+	var err error
+	SaoPauloTimeZone, err = time.LoadLocation("America/Sao_Paulo")
+	if err != nil {
+		fmt.Println("Erro ao carregar fuso horário:", err)
+		return
+	}
+
+}
 
 func main() {
 	err := godotenv.Load()

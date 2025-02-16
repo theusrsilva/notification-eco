@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
+	"strconv"
 )
 
 type UsuarioRepository interface {
@@ -50,6 +51,35 @@ func (repository UsuarioRepositoryDb) Find(usuario_id string) (*domain.Usuario, 
 		return nil, fmt.Errorf("usuario não existe")
 	}
 	return &usuario, nil
+
+}
+func (repository UsuarioRepositoryDb) Index(nome string, sobrenome string, cidade string, email string) ([]domain.Usuario, error) {
+	var usuarios []domain.Usuario
+	query := repository.Db.Preload("Notificacao")
+
+	if nome != "" {
+		query = query.Where("nome LIKE ?", "%"+nome+"%")
+	}
+	if email != "" {
+		query = query.Where("email LIKE ?", "%"+email+"%")
+	}
+	if cidade != "" {
+		cidadeInt, err := strconv.Atoi(cidade)
+		if err != nil {
+			return nil, err
+		}
+		query = query.Where("cidade = ?", cidadeInt)
+	}
+	if sobrenome != "" {
+		query = query.Where("cidade = ?", cidade)
+	}
+
+	err := query.Order("created_at DESC").Find(&usuarios).Error
+	if err != nil {
+		return nil, fmt.Errorf("erro ao buscar usuarios: %v", err)
+	}
+
+	return usuarios, nil
 
 }
 func (repository UsuarioRepositoryDb) Update(usuario *domain.Usuario) error {

@@ -17,7 +17,7 @@ func init() {
 
 type Notificacao struct {
 	Uid              string    `json:"uid" valid:"uuid" gorm:"type:varchar(36);primary_key"`
-	Usuario          *Usuario  `json:"usuario" valid:"-" gorm:"foreignKey:UsuarioId;references:Uid"`
+	Usuario          *Usuario  `json:"-" valid:"-" gorm:"foreignKey:UsuarioId;references:Uid"`
 	UsuarioId        string    `json:"-" valid:"-" gorm:"column:usuario_id;type:varchar(36);notnull"`
 	Sms              bool      `json:"aceita_sms" valid:"-"`
 	Push             bool      `json:"aceita_push" valid:"-"`

@@ -28,6 +28,8 @@ func NewServer(db *gorm.DB) *Server {
 func (s *Server) SetupRoutes() {
 	s.Router.GET("/cidades", s.Cidades)
 	s.Router.POST("/usuarios", s.StoreUsuario)
+	s.Router.GET("/usuarios/:uid", s.ShowUsuario)
+	s.Router.GET("/usuarios", s.IndexUsuario)
 }
 func (s *Server) Cidades(c *gin.Context) {
 	cidadeInput := c.DefaultQuery("nome", "")
@@ -69,7 +71,7 @@ func (s *Server) StoreUsuario(c *gin.Context) {
 		return
 	}
 	if req.Horario == "" {
-		req.Horario = "10:00" // Defina o horário padrão aqui
+		req.Horario = "10:00"
 	}
 	usuarioNew, err := services.InsertUsuario(usuario, req.Horario, s.DB)
 
@@ -83,6 +85,34 @@ func (s *Server) StoreUsuario(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, usuarioNew)
+}
+
+func (s *Server) IndexUsuario(c *gin.Context) {
+	nomeInput := c.DefaultQuery("nome", "")
+	sobrenomeInput := c.DefaultQuery("sobrenome", "")
+	cidadeInput := c.DefaultQuery("cidade", "")
+	emailInput := c.DefaultQuery("email", "")
+
+	usuarios, err := services.IndexUsuario(nomeInput, sobrenomeInput, cidadeInput, emailInput, s.DB)
+
+	if err != nil {
+		log.Println("Erro: %v", err)
+		c.JSON(http.StatusNotFound, gin.H{"error": ""})
+		return
+	}
+
+	c.JSON(http.StatusOK, usuarios)
+}
+func (s *Server) ShowUsuario(c *gin.Context) {
+	uid := c.Param("uid")
+	usuario, err := services.ShowUsuario(uid, s.DB)
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, usuario)
 }
 
 func (s *Server) Start(port string) {
