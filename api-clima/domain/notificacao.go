@@ -33,11 +33,12 @@ func (Notificacao) TableName() string {
 }
 
 func NewNotificacao(usuario *Usuario, sms bool, push bool, web bool, email bool, time string) (*Notificacao, error) {
+	//alterar conforme liberar novas features
 	notificacao := Notificacao{
-		Sms:              sms,
-		Push:             push,
+		Sms:              false,
+		Push:             false,
 		Web:              web,
-		Email:            email,
+		Email:            false,
 		Notificacao_Time: time,
 	}
 

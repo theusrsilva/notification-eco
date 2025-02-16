@@ -2,6 +2,8 @@ package server
 
 import (
 	"api-clima/app/services"
+	"api-clima/domain"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"log"
@@ -25,6 +27,7 @@ func NewServer(db *gorm.DB) *Server {
 
 func (s *Server) SetupRoutes() {
 	s.Router.GET("/cidades", s.Cidades)
+	s.Router.POST("/usuarios", s.StoreUsuario)
 }
 func (s *Server) Cidades(c *gin.Context) {
 	cidadeInput := c.DefaultQuery("nome", "")
@@ -44,6 +47,42 @@ func (s *Server) Cidades(c *gin.Context) {
 		})
 	}
 	c.JSON(http.StatusOK, cidadesResponse)
+}
+func (s *Server) StoreUsuario(c *gin.Context) {
+	var req struct {
+		Nome      string `json:"nome" binding:"required"`
+		Sobrenome string `json:"sobrenome" binding:"required"`
+		Email     string `json:"email" binding:"required,email"`
+		Cidade    int    `json:"cidade" binding:"required,integer"`
+		Horario   string `json:"horario" binding:"omitempty"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	usuario, err := domain.NewUsuario(req.Nome, req.Sobrenome, req.Email, req.Cidade)
+	if err != nil {
+		log.Println("Erro: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": ""})
+		return
+	}
+	if req.Horario == "" {
+		req.Horario = "10:00" // Defina o horário padrão aqui
+	}
+	usuarioNew, err := services.InsertUsuario(usuario, req.Horario, s.DB)
+
+	if err != nil {
+		if err.Error() == fmt.Sprintf("erro: o email '%s' já está em uso", usuario.Email) {
+			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+			return
+		}
+		log.Println("Erro: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": ""})
+		return
+	}
+	c.JSON(http.StatusOK, usuarioNew)
 }
 
 func (s *Server) Start(port string) {

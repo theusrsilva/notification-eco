@@ -3,11 +3,12 @@ package repositories
 import (
 	"api-clima/domain"
 	"fmt"
+	"github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 )
 
 type UsuarioRepository interface {
-	Insert(usuario *domain.Usuario) (*domain.Usuario, error)
+	Insert(usuario *domain.Usuario, notificacao *domain.Notificacao) (*domain.Usuario, error)
 	Find(usuario *domain.Usuario) (*domain.Usuario, error)
 	Update(usuario *domain.Usuario) error
 }
@@ -19,8 +20,10 @@ type UsuarioRepositoryDb struct {
 func (repository UsuarioRepositoryDb) Insert(usuario *domain.Usuario, notificacao *domain.Notificacao) (*domain.Usuario, error) {
 	err := repository.Db.Create(usuario).Error
 
-	if err != nil {
-		return nil, err
+	if mysqlErr, ok := err.(*mysql.MySQLError); ok {
+		if mysqlErr.Number == 1062 {
+			return nil, fmt.Errorf("o email '%s' já está em uso", usuario.Email)
+		}
 	}
 
 	notificacao.UsuarioId = usuario.Uid
@@ -31,7 +34,12 @@ func (repository UsuarioRepositoryDb) Insert(usuario *domain.Usuario, notificaca
 		return nil, err
 	}
 
-	return usuario, nil
+	var usuarioComNotificacao domain.Usuario
+	err = repository.Db.Preload("Notificacao").First(&usuarioComNotificacao, "uid = ?", usuario.Uid).Error
+	if err != nil {
+		return nil, err
+	}
+	return &usuarioComNotificacao, nil
 }
 
 func (repository UsuarioRepositoryDb) Find(usuario_id string) (*domain.Usuario, error) {

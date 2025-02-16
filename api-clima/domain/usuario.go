@@ -14,7 +14,7 @@ type Usuario struct {
 	Uid         string       `json:"uid" valid:"uuid" gorm:"type:varchar(36);primary_key"`
 	Nome        string       `json:"nome" valid:"notnull" gorm:"type:varchar(50)"`
 	Sobrenome   string       `json:"sobrenome" valid:"notnull" gorm:"type:varchar(60)"`
-	Email       string       `json:"email" valid:"email" gorm:"type:varchar(100)"`
+	Email       string       `json:"email" valid:"email" gorm:"type:varchar(100);unique_index"`
 	Cidade      int          `json:"cidade_id" valid:"-" gorm:"index"`
 	CreatedAt   time.Time    `json:"created_at" valid:"-"`
 	UpdatedAt   time.Time    `json:"updated_at" valid:"-"`
