@@ -86,6 +86,9 @@ func (ns *NotificacaoService) BuscarNotificacoes(horario string) ([]domain.Notif
 
 func (s *NotificacaoService) EnviarNotificacao(n domain.Notificacao, wg *sync.WaitGroup) {
 	defer wg.Done()
+	if n.Sms == false && n.Push == false && n.Web == false && n.Email == false {
+		return
+	}
 	clima, err := BuscaClima(n)
 	if err != nil {
 		log.Println(err)
@@ -97,6 +100,7 @@ func (s *NotificacaoService) EnviarNotificacao(n domain.Notificacao, wg *sync.Wa
 		Uid:       n.Usuario.Uid,
 		Previsoes: clima,
 	}
+
 	if n.Sms == true {
 		mensagem.Tipo = "SMS"
 		body, err := json.Marshal(mensagem)
