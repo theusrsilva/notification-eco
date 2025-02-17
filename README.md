@@ -15,6 +15,9 @@
 - [ ] Configurar docker para rodar sozinho main das api`s
 - [ ] Configurar docker para clonar .env.example para .env
 
+### Como Executar 1.0
+- Na pasta principal, rodar ```docker compose up -d```
+
 ### Estrutura
 
 - Api`s : Golang 1.23.5
@@ -29,8 +32,15 @@
 ### Api-clima estrutura
 ![estrutura-api-clima.png](resources/estrutura-api-clima.png)
 
+### Fluxo de notificação api-clima
+![Fluxo-notificacao-api-clima.png](resources/Fluxo-notificacao-api-clima.png)
+
+### Fluxo de notificação api-notificações
+![Fluxo-notificacao-api-notificações.png](resources/Fluxo-notificacao-api-notifica%C3%A7%C3%B5es.png)
+
 ### Futuro
 
 - [ ] Integrar com keycloack para gerenciamento de usuários
 - [ ] Integrar com serviço de socket para mensagens em real time
 - [ ] Integrar com demais serviços para disparar os demais tipos de notificações
+- [ ] Rota para enviar notificação na hora para usuário
