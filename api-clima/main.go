@@ -1,10 +1,12 @@
 package main
 
 import (
+	"api-clima/app/services"
 	"api-clima/framework/database"
 	"api-clima/framework/server"
 	"fmt"
 	"github.com/joho/godotenv"
+	"github.com/robfig/cron/v3"
 	"log"
 	"os"
 	"strconv"
@@ -51,7 +53,21 @@ func main() {
 	if err != nil {
 		log.Fatalf("Erro ao conectar ao banco de dados: %v", err)
 	}
+	log.Println("Conexão com o banco iniciada.")
 	defer dbConnection.Close()
+
+	c := cron.New()
+	_, err = c.AddFunc("* * * * *", func() {
+		horario := time.Now().In(SaoPauloTimeZone).Format("15:04")
+		notificacaoService := services.NewNotificacaoService(dbConnection)
+		notificacaoService.ProcessaNotificacoes(horario)
+	})
+	if err != nil {
+		log.Fatalf("Erro ao adicionar cron job: %v", err)
+	}
+
+	log.Println("Cron job iniciado! Verificando notificações a cada minuto.")
+	c.Start()
 
 	srv := server.NewServer(dbConnection)
 	srv.Start(":8080")
