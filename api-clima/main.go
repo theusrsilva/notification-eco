@@ -77,5 +77,5 @@ func main() {
 	c.Start()
 
 	srv := server.NewServer(dbConnection)
-	srv.Start(":8080")
+	srv.Start(":3000")
 }
