@@ -21,7 +21,23 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    networks:
+      - notification-eco
     command: ["redis-server", "--appendonly", "yes"]
+
+  rabbitmq:
+    build: ./docker/rabbit
+    container_name: rabbitmq-eco
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - notification-eco
 
   api-clima:
     build: ./api-clima
@@ -33,6 +49,8 @@ services:
       - ./api-clima:/go/src/
     depends_on:
       - mysql
+      - rabbitmq
+      - redis
     networks:
       - notification-eco
 
@@ -40,6 +58,8 @@ volumes:
   mysql_data:
     driver: local
   redis_data:
+    driver: local
+  rabbitmq_data:
     driver: local
 networks:
   notification-eco:

@@ -25,7 +25,7 @@ func NewRedisClient(db int) *Redis {
 	if err != nil {
 		log.Fatal("Erro ao conectar no Redis: %v", err)
 	}
-	fmt.Println("✅ Conectado ao Redis!")
+	fmt.Println("Conectado ao Redis!")
 	return &Redis{Client: client, Ctx: ctx}
 }
 func (r *Redis) Insert(key string, value string, expiration time.Duration) error {

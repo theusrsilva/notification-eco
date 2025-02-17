@@ -3,6 +3,7 @@ package main
 import (
 	"api-clima/app/services"
 	"api-clima/framework/database"
+	"api-clima/framework/queue"
 	"api-clima/framework/server"
 	"fmt"
 	"github.com/joho/godotenv"
@@ -49,6 +50,12 @@ func main() {
 	db.DbType = os.Getenv("DB_TYPE")
 	db.Env = os.Getenv("ENV")
 
+	rabbitmq := queue.NewRabbitmq()
+	rabbitmq.RabbitMQURL = os.Getenv("RABBITMQ_URL")
+	rabbitmq.ExchangeName = os.Getenv("EXCHANGE_NAME")
+	rabbitmq.RoutingKey = os.Getenv("ROUTING_KEY")
+	rabbitmq.ContentType = os.Getenv("CONTENT_TYPE")
+
 	dbConnection, err := db.Connect()
 	if err != nil {
 		log.Fatalf("Erro ao conectar ao banco de dados: %v", err)
@@ -59,7 +66,7 @@ func main() {
 	c := cron.New()
 	_, err = c.AddFunc("* * * * *", func() {
 		horario := time.Now().In(SaoPauloTimeZone).Format("15:04")
-		notificacaoService := services.NewNotificacaoService(dbConnection)
+		notificacaoService := services.NewNotificacaoService(dbConnection, rabbitmq)
 		notificacaoService.ProcessaNotificacoes(horario)
 	})
 	if err != nil {

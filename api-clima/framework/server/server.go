@@ -55,7 +55,7 @@ func (s *Server) StoreUsuario(c *gin.Context) {
 		Nome      string `json:"nome" binding:"required"`
 		Sobrenome string `json:"sobrenome" binding:"required"`
 		Email     string `json:"email" binding:"required,email"`
-		Cidade    int    `json:"cidade" binding:"required,integer"`
+		Cidade    int    `json:"cidade" binding:"required"`
 		Horario   string `json:"horario" binding:"omitempty"`
 	}
 
