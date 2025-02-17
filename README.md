@@ -12,11 +12,18 @@
 - [ ] Criar base da api-notificações
 - [ ] Criar service para interagir com o serviço de mensageria
 - [ ] Feature para disparar as notificações para os lugares corretos
-- [ ] Configurar docker para rodar sozinho main das api`s
-- [ ] Configurar docker para clonar .env.example para .env
+- [X] Configurar docker para rodar sozinho main das api`s
+- [X] Configurar docker para clonar .env.example para .env
+- [ ] Rota para enviar notificação na hora para usuário
 
 ### Como Executar 1.0
-- Na pasta principal, rodar ```docker compose up -d```
+- Na pasta principal, rodar ```make start```
+- json do insomnia na pasta resources, so importar com as rotas
+
+### Fluxo de teste principal
+- Cadastrar usuário pela rota POST do insomnia
+- Lembre-se de cadastrar com um horário próximo ao que você está para testar(de preferência no próximo minuto)
+- Aguardar o Scheduler rodar
 
 ### Estrutura
 
@@ -43,4 +50,3 @@
 - [ ] Integrar com keycloack para gerenciamento de usuários
 - [ ] Integrar com serviço de socket para mensagens em real time
 - [ ] Integrar com demais serviços para disparar os demais tipos de notificações
-- [ ] Rota para enviar notificação na hora para usuário
